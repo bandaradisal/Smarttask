@@ -1,6 +1,9 @@
 package lk.nibm.kd.hdse261.smart_task_scheduler.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -9,13 +12,16 @@ import java.time.LocalDate;
 @Data
 public class Task {
 
-    Long id;
-    String title;
-    String description;
-    String priority; // HIGH, MEDIUM, LOW
-    boolean completed;
-    boolean favourite;
-    LocalDate deadline;
-    Long taskListId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    private String title;
+    private String description;
+    private String priority; // HIGH, MEDIUM, LOW
+    private boolean completed;
+    private boolean favourite;
+    private LocalDate deadline;
+    private Long taskListId;
 
 }
