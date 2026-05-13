@@ -15,7 +15,6 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
     private String title;
     private String description;
     private String priority; // HIGH, MEDIUM, LOW

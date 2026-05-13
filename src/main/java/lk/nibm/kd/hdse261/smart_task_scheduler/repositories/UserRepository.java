@@ -1,8 +1,8 @@
 package lk.nibm.kd.hdse261.smart_task_scheduler.repositories;
 
-import lk.nibm.kd.hdse261.smart_task_scheduler.entities.Task;
+import lk.nibm.kd.hdse261.smart_task_scheduler.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface TaskRepository extends JpaRepository<Task,Long> {
+public interface UserRepository extends JpaRepository <User,Long>{
 
 }
