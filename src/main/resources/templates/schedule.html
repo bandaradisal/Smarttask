@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Smart Task Scheduler — Algorithm-generated task execution schedule view."/>
+  <title>Schedule | Smart Task Scheduler</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+<body>
+
+<!-- ══ Global Loader ══════════════════════════════════════ -->
+<div id="global-loader" class="hidden">
+  <div class="spinner-ring"></div>
+</div>
+
+<!-- ══ Alert Container ════════════════════════════════════ -->
+<div id="alert-container"></div>
+
+<!-- ══ Navbar ═════════════════════════════════════════════ -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand" href="index.html">
+      <span class="brand-icon">🗓️</span> SmartTask
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarMain">
+      <ul class="navbar-nav ms-auto gap-1">
+        <li class="nav-item"><a class="nav-link" href="/"             data-page="index.html">📊 Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="/tasks-page"   data-page="tasks.html">📋 Tasks</a></li>
+        <li class="nav-item"><a class="nav-link" href="/schedule"     data-page="schedule.html">⚡ Schedule</a></li>
+        <li class="nav-item"><a class="nav-link" href="/dependencies" data-page="dependencies.html">🔗 Dependencies</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ Page Content ═══════════════════════════════════════ -->
+<main class="page-wrapper">
+  <div class="container-fluid px-4">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>⚡ Smart Schedule</h1>
+      <p>Algorithm-powered task execution order based on priority and dependencies.</p>
+    </div>
+
+    <!-- Algorithm Info Box -->
+    <!--
+      M3 integration point:
+      This section explains the algorithms powering the schedule.
+      Member 3 connects:
+        - HeapScheduler   → /api/tasks/sorted   (priority ordering)
+        - TopologicalSort → /api/tasks/schedule  (dependency ordering)
+        - GreedyScheduler → optional greedy picks
+      TODO: Update the algorithm descriptions below when Member 3 finalises their endpoint.
+    -->
+    <div class="algo-info-box">
+      <h6>🧠 Powered by PDSA Algorithms</h6>
+      <div class="row g-2">
+        <div class="col-md-4">
+          <strong>🏔️ Heap Scheduler</strong><br/>
+          <span>Tasks are extracted from a Min-Heap Priority Queue — HIGH priority always surfaces first.</span>
+        </div>
+        <div class="col-md-4">
+          <strong>🔗 Topological Sort</strong><br/>
+          <span>Kahn's Algorithm ensures prerequisite tasks are always scheduled before dependent ones.</span>
+        </div>
+        <div class="col-md-4">
+          <strong>⚡ Greedy Scheduling</strong><br/>
+          <span>Nearest-deadline + highest-priority selection for the optimal local execution order.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- View Toggle -->
+    <div class="section-header mb-3">
+      <h2>📅 Execution Order</h2>
+      <div class="btn-group btn-group-sm" role="group" aria-label="View toggle">
+        <button type="button" class="btn btn-outline-primary active" id="btnTimeline" onclick="setView('timeline')">🗂️ Timeline</button>
+        <button type="button" class="btn btn-outline-primary"        id="btnTable"    onclick="setView('table')">📊 Table</button>
+      </div>
+    </div>
+
+    <!-- ── Timeline View ─────────────────────────────── -->
+    <div id="timelineView">
+      <div class="card" id="scheduleTimelineCard">
+        <div class="card-body p-0" id="scheduleTimeline">
+          <!-- Populated by renderScheduleTimeline() -->
+          <div class="empty-state py-4"><div class="spinner-ring mx-auto"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Table View ────────────────────────────────── -->
+    <div id="tableView" style="display:none;">
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width:50px;">Order</th>
+                <th>Title</th>
+                <th>Priority</th>
+                <th>Deadline</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="scheduleTableTbody">
+              <tr><td colspan="5"><div class="empty-state py-4"><div class="spinner-ring mx-auto"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Refresh Button -->
+    <div class="text-end mt-3">
+      <button class="btn btn-outline-primary btn-sm" onclick="refreshPage()">🔄 Refresh Schedule</button>
+    </div>
+
+    <!-- Info Note -->
+    <div class="mt-4 p-3 rounded" style="background:#f8fafc;border:1px solid #e2e8f0;font-size:0.82rem;color:#64748b;">
+      ℹ️ <strong>Note:</strong> This schedule view will display the algorithm-generated task execution order 
+      once Member 3's backend endpoints (<code>/api/tasks/sorted</code> and <code>/api/tasks/schedule</code>) are fully integrated.
+      Currently showing best available ordering.
+    </div>
+
+  </div>
+</main>
+
+<!-- ══ Footer ═════════════════════════════════════════════ -->
+<footer>
+  <span>Smart Task Scheduler</span> © 2026 — HDSE261 Team Project
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app.js"></script>
+<script>
+  /* ── Schedule Page Logic ────────────────────────────── */
+
+  // TODO: M3 — integrate topological sort API from Member 3
+  //       Replace loadSchedule() data source when /api/tasks/schedule is ready.
+
+  let _currentView = 'timeline';
+
+  function setView(view) {
+    _currentView = view;
+    document.getElementById('timelineView').style.display = view === 'timeline' ? '' : 'none';
+    document.getElementById('tableView').style.display    = view === 'table'    ? '' : 'none';
+    document.getElementById('btnTimeline').classList.toggle('active', view === 'timeline');
+    document.getElementById('btnTable').classList.toggle('active',    view === 'table');
+  }
+
+  /**
+   * Render schedule rows in timeline style.
+   * M3 integration point: tasks array comes from /api/tasks/schedule (topological order).
+   */
+  function renderScheduleTimeline(tasks) {
+    const container = document.getElementById('scheduleTimeline');
+    if (!container) return;
+
+    if (!tasks || tasks.length === 0) {
+      renderEmptyState(container, '⚡', 'No schedule data', 'Add tasks and dependencies to generate a schedule.');
+      return;
+    }
+
+    container.innerHTML = tasks.map((t, i) => `
+      <div class="schedule-row">
+        <span class="schedule-order-badge">${i + 1}</span>
+        <div class="flex-grow-1">
+          <div class="fw-600">${t.title || '—'}</div>
+          <div class="text-muted-sm">${t.description || 'No description'}</div>
+        </div>
+        <div class="d-flex flex-column align-items-end gap-1">
+          ${priorityBadge(t.priority)}
+          <span class="text-muted-sm">${formatDate(t.deadline)}</span>
+        </div>
+        <div>${statusBadge(t.completed)}</div>
+      </div>`).join('');
+  }
+
+  /**
+   * Render schedule in table view.
+   * M3 integration point: same data source as timeline.
+   */
+  function renderScheduleTable(tasks) {
+    const tbody = document.getElementById('scheduleTableTbody');
+    if (!tbody) return;
+
+    if (!tasks || tasks.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state py-3">
+        <div class="empty-icon">📋</div><h5>No tasks scheduled</h5></div></td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = tasks.map((t, i) => `
+      <tr>
+        <td><span class="schedule-order-badge">${i + 1}</span></td>
+        <td class="fw-600">${t.title || '—'}</td>
+        <td>${priorityBadge(t.priority)}</td>
+        <td class="text-muted-sm">${formatDate(t.deadline)}</td>
+        <td>${statusBadge(t.completed)}</td>
+      </tr>`).join('');
+  }
+
+  async function refreshPage() {
+    // M3 integration point: loadSchedule() calls /api/tasks/schedule
+    // TODO: When Member 3 connects their TopologicalSort endpoint,
+    //       this will return the dependency-aware execution order.
+    const tasks = await loadSchedule();
+    renderScheduleTimeline(tasks);
+    renderScheduleTable(tasks);
+  }
+
+  // Init
+  refreshPage();
+</script>
+</body>
+</html>

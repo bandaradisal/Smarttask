@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Smart Task Scheduler — Add or Edit a task."/>
+  <title>Task Form | Smart Task Scheduler</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✏️</text></svg>"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+<div id="global-loader" class="hidden"><div class="spinner-ring"></div></div>
+<div id="alert-container"></div>
+
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand" href="index.html"><span class="brand-icon">🗓️</span> SmartTask</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarMain">
+      <ul class="navbar-nav ms-auto gap-1">
+        <li class="nav-item"><a class="nav-link" href="/"             data-page="index.html">📊 Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="/tasks-page"   data-page="tasks.html">📋 Tasks</a></li>
+        <li class="nav-item"><a class="nav-link" href="/schedule"     data-page="schedule.html">⚡ Schedule</a></li>
+        <li class="nav-item"><a class="nav-link" href="/dependencies" data-page="dependencies.html">🔗 Dependencies</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="page-wrapper">
+  <div class="container" style="max-width:680px;">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb" style="font-size:0.82rem;">
+        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="/tasks-page">Tasks</a></li>
+        <li class="breadcrumb-item active" id="breadcrumbAction">Add Task</li>
+      </ol>
+    </nav>
+
+    <!-- Form Card -->
+    <div class="card">
+      <div class="card-body p-0">
+        <div style="background:var(--navbar-bg);padding:1.25rem 1.5rem;border-radius:var(--radius) var(--radius) 0 0;">
+          <h5 class="mb-0 text-white fw-600" id="formTitle">➕ Add New Task</h5>
+          <p class="mb-0 mt-1" style="color:rgba(255,255,255,.6);font-size:0.82rem;" id="formSubtitle">
+            Fill in the details below to create a new task.
+          </p>
+        </div>
+
+        <div class="p-4">
+          <!--
+            M2 integration point:
+            All fields below have .invalid-feedback divs ready for
+            Member 2's GlobalExceptionHandler error responses.
+            showFieldErrors(errorsObj) in app.js maps errors to these fields.
+            TODO: Member 2 — connect validation error rendering here via showFieldErrors()
+          -->
+
+          <!-- Title -->
+          <div class="mb-4">
+            <label for="fTitle" class="form-label">Title <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="fTitle"
+                   placeholder="e.g. Prepare final project report"
+                   maxlength="100" autocomplete="off"/>
+            <div class="invalid-feedback"></div>
+            <!-- M2: @NotBlank @Size(min=2, max=100) -->
+            <div class="form-text text-muted-sm">Max 100 characters.</div>
+          </div>
+
+          <!-- Description -->
+          <div class="mb-4">
+            <label for="fDescription" class="form-label">Description</label>
+            <textarea class="form-control" id="fDescription" rows="3"
+                      placeholder="Optional — describe what this task involves…"
+                      maxlength="500"></textarea>
+            <div class="invalid-feedback"></div>
+            <!-- M2: @Size(max=500) -->
+            <div class="form-text text-muted-sm">Max 500 characters.</div>
+          </div>
+
+          <!-- Priority + Deadline row -->
+          <div class="row g-3 mb-4">
+            <div class="col-sm-6">
+              <label for="fPriority" class="form-label">Priority <span class="text-danger">*</span></label>
+              <select class="form-select" id="fPriority">
+                <option value="">— Select Priority —</option>
+                <option value="HIGH">🔥 High</option>
+                <option value="MEDIUM">⚡ Medium</option>
+                <option value="LOW">🌿 Low</option>
+              </select>
+              <div class="invalid-feedback"></div>
+              <!-- M2: @NotNull @Pattern(regexp="HIGH|MEDIUM|LOW") -->
+            </div>
+            <div class="col-sm-6">
+              <label for="fDeadline" class="form-label">Deadline</label>
+              <input type="date" class="form-control" id="fDeadline"/>
+              <div class="invalid-feedback"></div>
+              <!-- M2: @Future — must be a future date -->
+              <div class="form-text text-muted-sm">Must be a future date.</div>
+            </div>
+          </div>
+
+          <!-- Task List -->
+          <div class="mb-4">
+            <label for="fTaskListId" class="form-label">Task List</label>
+            <select class="form-select" id="fTaskListId">
+              <option value="">— No List Selected —</option>
+              <!-- Populated via populateListDropdown() from GET /api/lists -->
+            </select>
+            <div class="invalid-feedback"></div>
+            <div class="form-text text-muted-sm">Group this task under a named list.</div>
+          </div>
+
+          <!-- Priority visual preview -->
+          <div class="mb-4 p-3 rounded" style="background:#f8fafc;border:1px dashed #cbd5e1;">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <span class="text-muted-sm">Priority preview:</span>
+              <span id="priorityPreview" class="badge-priority badge-low">LOW</span>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="d-flex gap-2 justify-content-end flex-wrap">
+            <a href="/tasks-page" class="btn btn-outline-secondary">✕ Cancel</a>
+            <button type="button" class="btn btn-primary" id="submitBtn" onclick="handleFormSubmit()">
+              💾 Save Task
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer><span>Smart Task Scheduler</span> © 2026 — HDSE261 Team Project</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/app.js"></script>
+<script>
+  /* ── Task Form Page Logic ───────────────────────────── */
+
+  // Detect edit mode from URL: task-form.html?id=5
+  const urlParams   = new URLSearchParams(window.location.search);
+  const editId      = urlParams.get('id') ? parseInt(urlParams.get('id')) : null;
+  const isEditMode  = !!editId;
+
+  /** Update priority badge preview when dropdown changes */
+  document.getElementById('fPriority')?.addEventListener('change', function () {
+    const preview = document.getElementById('priorityPreview');
+    if (!preview) return;
+    const map = { HIGH: 'badge-high', MEDIUM: 'badge-medium', LOW: 'badge-low' };
+    preview.className = 'badge-priority ' + (map[this.value] || 'badge-low');
+    preview.textContent = this.value || 'LOW';
+  });
+
+  /** Load task data into form when in edit mode */
+  async function initForm() {
+    await populateListDropdown('fTaskListId');
+
+    if (isEditMode) {
+      document.getElementById('formTitle').textContent      = '✏️ Edit Task';
+      document.getElementById('formSubtitle').textContent   = `Editing Task #${editId}`;
+      document.getElementById('breadcrumbAction').textContent = 'Edit Task';
+      document.getElementById('submitBtn').textContent      = '💾 Update Task';
+
+      const task = await getTaskById(editId);
+      if (!task) {
+        showAlert('Task not found. Redirecting…', 'danger');
+        setTimeout(() => window.location.href = 'tasks.html', 2000);
+        return;
+      }
+      fillTaskForm(task);
+      // Update preview badge
+      const preview = document.getElementById('priorityPreview');
+      if (preview && task.priority) {
+        const map = { HIGH: 'badge-high', MEDIUM: 'badge-medium', LOW: 'badge-low' };
+        preview.className = 'badge-priority ' + (map[task.priority] || 'badge-low');
+        preview.textContent = task.priority;
+      }
+    }
+  }
+
+  async function handleFormSubmit() {
+    const data = readTaskForm();
+
+    // Frontend guard (M2 does full validation on backend)
+    if (!data.title) { showAlert('Title is required.', 'warning'); return; }
+    if (!data.priority) { showAlert('Priority is required.', 'warning'); return; }
+
+    let result;
+    if (isEditMode) {
+      // M2 integration: PUT validation errors caught in updateTask() in app.js
+      result = await updateTask(editId, data);
+    } else {
+      // M2 integration: POST validation errors caught in createTask() in app.js
+      // TODO: Member 2 — @NotBlank, @Future, @Pattern errors returned as JSON
+      result = await createTask(data);
+    }
+
+    if (result) {
+      setTimeout(() => window.location.href = '/tasks-page', 800);
+    }
+    // If null, error already shown via showAlert or showFieldErrors
+  }
+
+  // Override refreshPage used by global handlers
+  function refreshPage() { initForm(); }
+
+  // Init
+  initForm();
+</script>
+</body>
+</html>
