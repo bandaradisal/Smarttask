@@ -11,9 +11,7 @@ public class UserResponseDTO {
 
     private Long id;
     private String email;
+    private String phoneNumber;
 
-    // DO NOT include password
-
-    // getters and setters
-
+    // Do not include password in response DTO
 }

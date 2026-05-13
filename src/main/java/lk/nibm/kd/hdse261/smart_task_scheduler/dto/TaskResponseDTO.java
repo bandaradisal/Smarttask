@@ -15,7 +15,5 @@ public class TaskResponseDTO {
     private boolean favourite;
     private String priority;
     private String deadline;
-
-    // getters and setters
-
+    private Long taskListId;
 }

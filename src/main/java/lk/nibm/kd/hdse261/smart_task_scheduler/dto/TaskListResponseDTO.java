@@ -12,7 +12,5 @@ public class TaskListResponseDTO {
     private Long id;
     private String name;
     private String color;
-
-    // getters and setters
-
+    private Long groupId;
 }

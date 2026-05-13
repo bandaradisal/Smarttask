@@ -1,26 +1,33 @@
 package lk.nibm.kd.hdse261.smart_task_scheduler.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "tasks")
 @Data
 public class Task {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String title;
-    private String description;
-    private String priority; // HIGH, MEDIUM, LOW
-    private boolean completed;
-    private boolean favourite;
-    private LocalDate deadline;
-    private Long taskListId;
 
+    @Column(nullable = false, length = 100)
+    private String title;
+
+    @Column(length = 500)
+    private String description;
+
+    @Column(nullable = false)
+    private String priority;
+
+    private boolean completed;
+
+    private boolean favourite;
+
+    private LocalDate deadline;
+
+    private Long taskListId;
 }
